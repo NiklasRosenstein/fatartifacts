@@ -1,3 +1,4 @@
 /_storage/
 /Pipfile
 /Pipfile.lock
+*.egg-info
