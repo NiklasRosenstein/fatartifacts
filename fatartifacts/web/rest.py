@@ -105,6 +105,6 @@ def read(group_id, artifact_id, version, tag):
   if obj.has_web_uri():
     return redirect(obj.uri)
   # XXX Support HTTP Range header?
-  fp = app.storage.open_read_file(group_id, artifact_id, version, tag, obj.filename)
+  fp = app.storage.open_read_file(group_id, artifact_id, version, tag, obj.filename, obj.uri)
   return send_file(fp, mimetype=obj.mime, as_attachment=True,
     attachment_filename=obj.filename)

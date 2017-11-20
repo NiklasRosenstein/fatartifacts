@@ -72,9 +72,13 @@ class FsStorage(storage.Storage):
     return FsWriteStream(path), 'file://' + path
 
   def open_read_file(self, group_id: str, artifact_id: str, version: str,
-                     tag: str, filename: str) -> BinaryIO:
-    path = self.get_storage_path(group_id, artifact_id, version, tag, filename)
-    return open(path, 'rb')
+                     tag: str, filename: str, uri: str) -> BinaryIO:
+    # We must use the URI becaue the filename may contain
+    # other characters.
+    if not uri.startswith('file://'):
+      raise FileNotFoundError(filename)
+    #path = self.get_storage_path(group_id, artifact_id, version, tag, filename)
+    return open(uri[7:], 'rb')
 
   def delete_file(self, group_id: str, artifact_id: str, version: str,
                   tag: str, filename: str) -> bool:

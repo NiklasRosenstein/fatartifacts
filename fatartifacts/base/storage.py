@@ -50,7 +50,7 @@ class Storage(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   def open_read_file(self, group_id: str, artifact_id: str, version: str,
-                     tag: str, filename: str) -> BinaryIO:
+                     tag: str, filename: str, uri: str) -> BinaryIO:
     """
     Open a file for reading. For serving content, you should first check if
     the *uri* is an HTTP or HTTPS URL and serve the content preferably from
