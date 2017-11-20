@@ -12,11 +12,9 @@ import traceback
 
 app = FaBlueprint(__name__, __name__)
 
-# XXX Use app.accesscontrol to determine accessibility.
-# XXX Implement creation/deletion of artifacts (with respect to app.accesscontrol).
 
 def get_object_url(group_id, artifact_id, version, obj):
-  if obj.has_web_uri():
+  if obj.has_web_uri() and app.fa_config.web_urls_are_public:
     return obj.uri
   return url_for(__name__ + '.read',
     group_id=group_id, artifact_id=artifact_id, version=version, tag=obj.tag)
@@ -183,7 +181,7 @@ def read(group_id, artifact_id, version, tag):
     obj = app.database.get_artifact_object(group_id, artifact_id, version, tag)
   except ArtifactDoesNotExist:
     abort(404)
-  if obj.has_web_uri():
+  if obj.has_web_uri() and app.fa_config.web_urls_are_public:
     return redirect(obj.uri)
   # XXX Support HTTP Range header?
   fp, size = app.storage.open_read_file(group_id, artifact_id, version, tag, obj.filename, obj.uri)
