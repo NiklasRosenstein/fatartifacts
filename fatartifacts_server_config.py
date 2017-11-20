@@ -8,5 +8,5 @@ storage_dir = os.path.abspath('_storage')
 
 accesscontrol = SimpleAccessControl()
 database = PonyDatabase()
-database.connect('sqlite', os.path.join(storage_dir, 'db.sqlite'))
+database.connect('sqlite', os.path.join(storage_dir, 'db.sqlite'), create_db=True)
 storage = FsStorage(storage_dir)

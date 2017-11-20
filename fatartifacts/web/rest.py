@@ -1,8 +1,10 @@
 
 from .fablueprint import FaBlueprint
-from ..base.database import ArtifactDoesNotExist
+from ..base.database import ArtifactDoesNotExist, ArtifactAlreadyExists, ArtifactObject
 from flask import abort, redirect, request, url_for, send_file
 from flask_restful import Api, Resource
+from werkzeug.utils import secure_filename
+import shutil
 
 app = FaBlueprint(__name__, __name__)
 api = Api(app)
@@ -56,18 +58,34 @@ class Object(Resource):
     return {'tag': o.tag, 'filename': o.filename, 'url': url}
 
   def put(self, group_id, artifact_id, version, tag):
-    src = request.files.get('file')
-    if not src:
-      abort(400)
-    mime = request.data.get('mimetype')
+    mime = request.headers.get('Content-Type')
     if not mime:
-      abort(400)
-    filename = secure_filename(src.name)
-    dst, uri = app.storage.open_write_file(group_id, artifact_id, version, tag, filename)
+      abort(400, 'Missing Content-Type header.')
+    filename = request.headers.get('Content-Name')
+    if not filename:
+      abort(400, 'Missing Content-Name header.')
+
+    dst, uri = app.storage.open_write_file(group_id, artifact_id, version, tag, secure_filename(filename))
+
+    # XXX Check write permissions.
+    # XXX Limit artifact upload size?
     with dst:
-      shutil.copyfileobj(src, dst)
-      obj = ArtifactObject(tag, filename, uri, mime)
-      app.database.create_artifact(group_id, artifact_id, version, obj)
+      # Ensure that there is some data incoming.
+      data = request.stream.read(1024)
+      if not data:
+        abort(400, 'No data received.')
+      dst.write(data)
+
+      # Create an entry in the database.
+      try:
+        obj = ArtifactObject(tag, filename, uri, mime)
+        app.database.create_artifact(group_id, artifact_id, version, obj)
+      except ArtifactAlreadyExists as exc:
+        abort(400, 'Artifact {} already exists.'.format(exc))
+
+      # Copy the rest of the data.
+      shutil.copyfileobj(request.stream, dst)
+
     return {'message': "Artifact created."}
 
 
