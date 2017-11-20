@@ -1,0 +1,6 @@
+{
+  "name": "fatartifacts.docs",
+  "dependencies": {
+    "@NiklasRosenstein/yassg": "git+https://github.com/NiklasRosenstein/yassg.git"
+  }
+}
