@@ -1,4 +1,5 @@
 
+from .auth import AuthorizationError
 from .fablueprint import FaBlueprint
 from ..base.database import ArtifactDoesNotExist, ArtifactAlreadyExists, ArtifactObject
 from flask import abort, redirect, request, url_for, send_file
@@ -22,24 +23,36 @@ def get_object_url(group_id, artifact_id, version, obj):
 class ListGroupIds(Resource):
 
   def get(self):
-    return list(app.database.get_group_ids())
+    ac = app.accesscontrol
+    return [
+      group_id for group_id in app.database.get_group_ids()
+      if ac.get_group_permissions(request.user_id, group_id).can_read
+    ]
 
 
 class ListArtifactIds(Resource):
 
   def get(self, group_id):
-    return list(app.database.get_artifact_ids(group_id))
+    ac = app.accesscontrol
+    return [
+      artifact_id for artifact_id in app.database.get_artifact_ids(group_id)
+      if ac.get_artifact_permissions(request.user_id, group_id, artifact_id).can_read
+    ]
 
 
 class ListVersions(Resource):
 
   def get(self, group_id, artifact_id):
+    if not app.accesscontrol.get_artifact_permissions(request.user_id, group_id, artifact_id).can_read:
+      abort(404)
     return list(app.database.get_artifact_versions(group_id, artifact_id))
 
 
 class ListObjects(Resource):
 
   def get(self, group_id, artifact_id, version):
+    if not app.accesscontrol.get_artifact_permissions(request.user_id, group_id, artifact_id).can_read:
+      abort(404)
     result = {}
     for o in app.database.get_artifact_objects(group_id, artifact_id, version):
       url = get_object_url(group_id, artifact_id, version, o)
@@ -50,6 +63,8 @@ class ListObjects(Resource):
 class Object(Resource):
 
   def get(self, group_id, artifact_id, version, tag):
+    if not app.accesscontrol.get_artifact_permissions(request.user_id, group_id, artifact_id).can_read:
+      abort(404)
     try:
       o = app.database.get_artifact_object(group_id, artifact_id, version, tag)
     except ArtifactDoesNotExist:
@@ -58,6 +73,9 @@ class Object(Resource):
     return {'tag': o.tag, 'filename': o.filename, 'url': url}
 
   def put(self, group_id, artifact_id, version, tag):
+    if not app.accesscontrol.get_artifact_permissions(request.user_id, group_id, artifact_id).can_write:
+      abort(403)
+
     mime = request.headers.get('Content-Type')
     if not mime:
       abort(400, 'Missing Content-Type header.')
@@ -108,3 +126,11 @@ def read(group_id, artifact_id, version, tag):
   fp = app.storage.open_read_file(group_id, artifact_id, version, tag, obj.filename, obj.uri)
   return send_file(fp, mimetype=obj.mime, as_attachment=True,
     attachment_filename=obj.filename)
+
+
+@app.before_request
+def before_request():
+  try:
+    request.user_id = app.auth.do_authorization(request)
+  except AuthorizationError as exc:
+    abort(403, str(exc))
