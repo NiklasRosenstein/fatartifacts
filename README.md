@@ -134,7 +134,8 @@ the group or artifact.
 ### `fatartifacts-rest-cli`
 
 ```
-usage: fatartifacts-rest-cli [-h] [-n NAME] [-m MIME] [-u AUTH] [--test] [-d]
+usage: fatartifacts-rest-cli [-h] [-n NAME] [-m MIME] [-u AUTH] [-d]
+                             [-o OUTPUT] [--test]
                              apiurl object [file]
 
 The FatArtifacts CLI for the REST API to upload artifacts.
@@ -162,6 +163,9 @@ optional arguments:
                         via stdin.
   -d, --delete          Delete the object from the repository. Do not specify
                         a FILE argument when using this option.
+  -o OUTPUT, --output OUTPUT
+                        Download an object to the specified file. Use -o- to
+                        download to stdout.
   --test                Print the information that would be sent to the
                         repository and exit.
 ```

@@ -53,6 +53,10 @@ parser.add_argument('-d', '--delete', action='store_true', help='''
   when using this option.
   '''
 )
+parser.add_argument('-o', '--output', help='''
+  Download an object to the specified file. Use -o- to download to stdout.
+  '''
+)
 parser.add_argument('--test', action='store_true', help='''
   Print the information that would be sent to the repository and exit.
   '''
@@ -65,42 +69,60 @@ def build_basicauth(username, password):
 
 def main(argv=None):
   args = parser.parse_args(argv)
+
+  # Split the artifact object identifier into parts.
   parts = args.object.split(':')
   if len(parts) != 4:
-    print('error: invalid object ID:', args.object)
+    print('error: invalid artifact object id:', args.object)
     return 1
-  if args.delete and args.file:
-    print('error: FILE and -d, --delete are incompatible options.')
+
+  # Ensure the URL has a schema (adds HTTPS).
+  args.apiurl = args.apiurl.rstrip('/') + '/{}/{}/{}/{}'.format(*parts)
+  if not urllib.parse.urlparse(args.apiurl).scheme:
+    args.apiurl = 'https://' + url
+
+  # Ensure only one operation is specified (get, put, delete).
+  if sum(map(bool, (args.output, args.file, args.delete))) != 1:
+    print('error: incompatible arguments, specify one operation only.')
     return 1
-  if not args.delete and not args.file:
-    print('error: missing argument, specify either FILE or -d, --delete.')
-    return 1
-  if args.file and not args.name:
-    args.name = os.path.basename(args.file.name)
-  if args.file and not args.mime:
+
+  if args.file:
+    # Create a default value for the -n, --name option.
+    if not args.name:
+      args.name = os.path.basename(args.file.name)
+
+    # Try to guess the MIME type.
     args.mime = mimetypes.guess_type(args.name)[0] or mimetypes.guess_type(args.file.name)[0]
     if not args.mime:
       print('error: unable to guess MIME type. Specify -m, --mime')
       return 1
-  username = password = None
+
+  # Create the request headers.
+  headers = {}
+  if args.output:
+    method = 'GET'
+  elif args.file:
+    method = 'PUT'
+    headers['Content-Name'] = args.name
+    headers['Content-Type'] = args.mime
+  elif args.delete:
+    method = 'DELETE'
+
+  # Split username and password. Request the password if it was omitted.
+  # Then add the Authorization header.
+  auth_only_headers = {}
   if args.auth:
     username, password = args.auth.partition(':')[::2]
     if ':' not in args.auth:
       password = getpass.getpass('Password for {}:'.format(username))
       if not password:
         return 1
+    auth_only_headers['Authorization'] = build_basicauth(username, password)
+    headers.update(auth_only_headers)
 
-  headers = {}
-  if args.file:
-    headers.update({'Content-Type': args.mime, 'Content-Name': args.name})
-  if args.auth:
-    headers['Authorization'] = build_basicauth(username, password)
-  url = args.apiurl.rstrip('/') + '/{}/{}/{}/{}'.format(*parts)
-  if not urllib.parse.urlparse(url).scheme:
-    url = 'https://' + url
-
+  # If this is just a test, build a cURL command-line and print it.
   if args.test:
-    command = ['curl', '-X', 'DELETE' if args.delete else 'PUT', url]
+    command = ['curl', '-X', method, args.apiurl]
     for key, value in headers.items():
       command += ['-H', '{}: {}'.format(key, value)]
     if args.file:
@@ -108,14 +130,30 @@ def main(argv=None):
     print('$', ' '.join(map(shlex.quote, command)))
     return 0
 
-  if args.delete:
-    response = requests.delete(url, headers=headers)
-  else:
-    response = requests.put(url, data=args.file, headers=headers)
-  print(response.json()['message'])
+  # Issue the request.
+  response = requests.request(method, args.apiurl, headers=headers)
+  data = response.json()
   if response.status_code != 200:
+    print('error:', data['message'])
     return 2
-  return 0
+
+  if args.output:
+    data = response.json()
+    download_url = urllib.parse.urljoin(args.apiurl, data['url'])
+    response = requests.get(download_url, headers=auth_only_headers, stream=True)
+    try:
+      response.raise_for_status()
+    except requests.exceptions.HTTException as exc:
+      print('error:', exc)
+      return 3
+
+    if args.output == '-':
+      for chunk in response.iter_content(1024):
+        sys.stdout.buffer.write(chunk)
+    else:
+      with open(args.output, 'wb') as fp:
+        for chunk in response.iter_content(1024):
+          fp.write(chunk)
 
 
 def main_and_exit(argv=None):
