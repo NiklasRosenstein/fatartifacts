@@ -14,7 +14,7 @@ import tempfile
 
 class FsWriteStream(storage.WriteStream):
 
-  def __init__(self, filename, create_dir=True):
+  def __init__(self, filename: str, content_length: int, create_dir=True):
     self._filename = filename
     # XXX ensure temporary file is created on the same device as the output
     #     filename so we can use #os.rename() instead of #shutil.move().
@@ -22,6 +22,8 @@ class FsWriteStream(storage.WriteStream):
     self._create_dir = create_dir
     self._aborted = False
     self._closed = False
+    self._content_length = content_length
+    self._bytes_written = 0
 
   def abort(self):
     if self._closed and not self._aborted:
@@ -55,7 +57,13 @@ class FsWriteStream(storage.WriteStream):
         pass
 
   def write(self, data):
-    return self._tempfile.write(data)
+    if self._bytes_written + len(data) > self._content_length:
+      raise storage.WriteExcessError()
+    written = self._tempfile.write(data)
+    self._bytes_written += written
+    if written != len(data):
+      raise RuntimeError('wrote {} instead of {} bytes'.format(written, len(data)))
+    return written
 
 
 class FsStorage(storage.Storage):
@@ -77,18 +85,21 @@ class FsStorage(storage.Storage):
     )
 
   def open_write_file(self, group_id: str, artifact_id: str, version: str,
-                      tag: str, filename: str) -> Tuple[storage.WriteStream, str]:
+                      tag: str, filename: str, content_length: int) \
+                      -> Tuple[storage.WriteStream, str]:
     path = self.get_storage_path(group_id, artifact_id, version, tag, filename)
-    return FsWriteStream(path), 'file://' + path
+    return FsWriteStream(path, content_length), 'file://' + path
 
   def open_read_file(self, group_id: str, artifact_id: str, version: str,
-                     tag: str, filename: str, uri: str) -> BinaryIO:
+                     tag: str, filename: str, uri: str) -> Tuple[BinaryIO, int]:
     # We must use the URI becaue the filename may contain
     # other characters.
     if not uri.startswith('file://'):
       raise FileNotFoundError(filename)
     #path = self.get_storage_path(group_id, artifact_id, version, tag, filename)
-    return open(uri[7:], 'rb')
+    fname = uri[7:]
+    size = os.stat(fname).st_size
+    return open(fname, 'rb'), size
 
   def delete_file(self, group_id: str, artifact_id: str, version: str,
                   tag: str, filename: str, uri: str):

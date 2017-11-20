@@ -120,6 +120,10 @@ def main(argv=None):
     auth_only_headers['Authorization'] = build_basicauth(username, password)
     headers.update(auth_only_headers)
 
+  # Set the Content-Length header.
+  if args.file:
+    headers['Content-Length'] = str(os.stat(args.file.name).st_size)
+
   # If this is just a test, build a cURL command-line and print it.
   if args.test:
     command = ['curl', '-X', method, args.apiurl]
@@ -131,7 +135,7 @@ def main(argv=None):
     return 0
 
   # Issue the request.
-  response = requests.request(method, args.apiurl, headers=headers)
+  response = requests.request(method, args.apiurl, data=args.file, headers=headers)
   data = response.json()
   if response.status_code != 200:
     print('error:', data['message'])
@@ -154,6 +158,8 @@ def main(argv=None):
       with open(args.output, 'wb') as fp:
         for chunk in response.iter_content(1024):
           fp.write(chunk)
+  else:
+    print(data['message'])
 
 
 def main_and_exit(argv=None):

@@ -2,11 +2,13 @@
 from .auth import AuthorizationError
 from .fablueprint import FaBlueprint
 from ..base.database import ArtifactDoesNotExist, ArtifactAlreadyExists, ArtifactObject
+from ..base.storage import WriteExcessError
 from flask import abort, redirect, request, url_for, send_file, Response
 from werkzeug.exceptions import HTTPException
 import functools
 import json
 import shutil
+import traceback
 
 app = FaBlueprint(__name__, __name__)
 
@@ -31,6 +33,7 @@ def jsonify(func):
         'message': str(e)
       }), status=e.code, mimetype='text/json')
     except Exception as e:
+      traceback.print_exc()
       return Response(json.dumps({
         'message': 'The server has encountered an internal server error.'
       }), status=500, mimetype='text/json')
@@ -117,8 +120,15 @@ def handle_object(group_id, artifact_id, version, tag):
     filename = request.headers.get('Content-Name')
     if not filename:
       abort(400, 'Missing Content-Name header.')
+    content_length = request.headers.get('Content-Length')
+    try:
+      content_length = int(content_length)
+      if content_length <= 0:
+        raise ValueError
+    except ValueError:
+      abort(400, 'Missing or invalid Content-Length header.')
 
-    dst, uri = app.storage.open_write_file(group_id, artifact_id, version, tag, filename)
+    dst, uri = app.storage.open_write_file(group_id, artifact_id, version, tag, filename, content_length)
 
     # XXX Check write permissions.
     # XXX Limit artifact upload size?
@@ -137,7 +147,11 @@ def handle_object(group_id, artifact_id, version, tag):
         abort(400, 'Object {} already exists.'.format(exc))
 
       # Copy the rest of the data.
-      shutil.copyfileobj(request.stream, dst)
+      try:
+        shutil.copyfileobj(request.stream, dst)
+      except WriteExcessError as exc:
+        abort(400, 'Received more data than specified in the Content-Length '
+                   'header (expected {}).'.format(content_length))
 
     return {'message': "Object {}:{}:{}:{} created.".format(group_id, artifact_id, version, tag)}
 
@@ -172,9 +186,10 @@ def read(group_id, artifact_id, version, tag):
   if obj.has_web_uri():
     return redirect(obj.uri)
   # XXX Support HTTP Range header?
-  fp = app.storage.open_read_file(group_id, artifact_id, version, tag, obj.filename, obj.uri)
-  return send_file(fp, mimetype=obj.mime, as_attachment=True,
-    attachment_filename=obj.filename)
+  fp, size = app.storage.open_read_file(group_id, artifact_id, version, tag, obj.filename, obj.uri)
+  response = send_file(fp, mimetype=obj.mime, as_attachment=True, attachment_filename=obj.filename)
+  response.headers.add('Content-Length', str(size))
+  return response
 
 
 @app.before_request

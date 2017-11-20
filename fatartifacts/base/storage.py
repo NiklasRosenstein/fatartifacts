@@ -9,6 +9,10 @@ import abc
 import io
 
 
+class WriteExcessError(Exception):
+  pass
+
+
 class WriteStream(metaclass=abc.ABCMeta):
 
   def __enter__(self):
@@ -30,7 +34,10 @@ class WriteStream(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   def write(self, data: bytes) -> int:
-    pass
+    """
+    Must raise #WriteExcessError if more data is being written than specified
+    to #Storage.open_write_file().
+    """
 
 
 # XXX Exception types for errors in the Storage API?
@@ -39,7 +46,8 @@ class Storage(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   def open_write_file(self, group_id: str, artifact_id: str, version: str,
-                      tag: str, filename: str) -> Tuple[WriteStream, str]:
+                      tag: str, filename: str, content_length: int) \
+                      -> Tuple[WriteStream, str]:
     """
     Open a file in an artifact object for writing. The #WriteStream interface
     allows you to abort the writing process without destroying the previous
@@ -52,11 +60,14 @@ class Storage(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   def open_read_file(self, group_id: str, artifact_id: str, version: str,
-                     tag: str, filename: str, uri: str) -> BinaryIO:
+                     tag: str, filename: str, uri: str) -> Tuple[BinaryIO, int]:
     """
     Open a file for reading. For serving content, you should first check if
     the *uri* is an HTTP or HTTPS URL and serve the content preferably from
     that URL.
+
+    Returns a tuple of a file-like object and the number of bytes in that
+    file.
     """
 
   @abc.abstractmethod
