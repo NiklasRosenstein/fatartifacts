@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FatArtifacts</title>
+    <link rel="stylesheet" href="../static/semantic-2.2.11.min.css">
+    <script src="../static/jquery-3.2.1"></script>
+    <script src="../static/semantic-2.2.11.min.css"></script>
+    <link rel="stylesheet" href="../static/style.css">
+    <style>
+    body {
+      margin-top: 30px;
+    }
+    img[align=left] {
+      padding-right: 1em;
+    }
+    img[align=right] {
+      padding-left: 1em;
+    }
+    .ui.text::after {
+      clear: both;
+      content: "";
+    }
+    .ui.footer.segment {
+      margin: 5em 0em 0em;
+      padding: 5em 0em;
+    }
+    pre {
+      padding: 0.5em 1em;
+      background-color: #eee;
+      overflow: auto;
+    }
+    #disqus_thread {
+      margin-top: 7em;
+    }
+    blockquote {
+      font-style: italic;
+      color: gray;
+    }
+    .ui.main img {
+      max-width: 100%;
+    }
+    
+    </style>
+
+    
+  </head>
+  <body>
+
+    
+
+    <!-- header -->
+    <div class="ui fixed inverted menu">
+      <div class="ui container">
+        <span class="header item">
+          <!--<img class="logo" src="assets/images/logo.png">-->
+          FatArtifacts
+        </span>
+        
+          
+      
+      
+      
+        <a href="../" class="item ">Home</a>
+      
+    
+        
+          
+      
+      
+      
+        <a href="./" class="item active">Layers</a>
+      
+    
+        
+          
+      
+      
+      
+        <a href="../restapi/" class="item ">REST-Api</a>
+      
+    
+        
+          
+      
+      
+      
+        <a href="../restcli/" class="item ">REST-Cli</a>
+      
+    
+        
+
+      
+      </div>
+    </div>
+
+    <div class="ui grid container main">
+      <div class="twelve wide column">
+        <!-- content -->
+        <div class="ui text container">
+          
+            <h1>Layers</h1>
+          
+          <h2 id="database">Database</h2>
+<h3 id="base-fatartifactsbasedatabaseponydatabase">BASE <code>fatartifacts.base.database.PonyDatabase</code></h3>
+<h3 id="impl-fatartifactscontribponydbponydatabase">IMPL <code>fatartifacts.contrib.ponydb.PonyDatabase</code></h3>
+<p>A database implementation using Pony-ORM. Can be connected to anything that
+Pony supports, for example SQLite, PostgreSQL and MySQL.</p>
+<h2 id="storage">Storage</h2>
+<h3 id="base-fatartifactsbasestoragestorage">BASE <code>fatartifacts.base.storage.Storage</code></h3>
+<h3 id="base-fatartifactscontribfsstoragefsstorage">BASE <code>fatartifacts.contrib.fsstorage.FsStorage</code></h3>
+<p>Manages objects on the local-filesystem under one common directory.</p>
+<h3 id="impl-fatartifactscontribazureblobstorageazureblobstorage">IMPL <code>fatartifacts.contrib.azureblobstorage.AzureBlobStorage</code></h3>
+<p>Manages objects on an Azure Blob Storage account.</p>
+<h2 id="accesscontrol">AccessControl</h2>
+<h3 id="base-fatartifactsbaseaccesscontrolaccesscontrol">BASE <code>fatartifacts.base.accesscontrol.AccessControl</code></h3>
+<h3 id="impl-fatartifactscontribsimpleacsimpleaccesscontrol">IMPL <code>fatartifacts.contrib.simpleac.SimpleAccessControl</code></h3>
+<p>Global read, user-bound write/delete, optionally group IDs must be prefixed
+with the user ID.</p>
+<h2 id="rest-api-authentication">REST Api Authentication</h2>
+<h3 id="base-fatartifactswebauthauthorizer">BASE <code>fatartifacts.web.auth.Authorizer</code></h3>
+<h3 id="impl-fatartifactswebauthhardcodedauthorizer">IMPL <code>fatartifacts.web.auth.HardcodedAuthorizer</code></h3>
+<p>Hardcode usernames and password-hashes with a Python dictionary. Example:</p>
+<div class="codehilite"><pre><span></span><span class="n">auth</span> <span class="o">=</span> <span class="n">HardcodedAuthorizer</span><span class="p">({</span>
+  <span class="s1">&#39;root&#39;</span><span class="p">:</span> <span class="s1">&#39;md5:7c9fb847d117531433435b68b61f91f6&#39;</span>
+<span class="p">})</span>
+</pre></div>
+        </div>
+
+        <!-- disqus support -->
+        
+      </div>
+
+      <!-- Table of contents -->
+      <div class="four wide column">
+        
+        
+          <h1>Table of Contents</h1>
+          <div class="toc">
+<ul>
+<li><a href="#database">Database</a><ul>
+<li><a href="#base-fatartifactsbasedatabaseponydatabase">BASE fatartifacts.base.database.PonyDatabase</a></li>
+<li><a href="#impl-fatartifactscontribponydbponydatabase">IMPL fatartifacts.contrib.ponydb.PonyDatabase</a></li>
+</ul>
+</li>
+<li><a href="#storage">Storage</a><ul>
+<li><a href="#base-fatartifactsbasestoragestorage">BASE fatartifacts.base.storage.Storage</a></li>
+<li><a href="#base-fatartifactscontribfsstoragefsstorage">BASE fatartifacts.contrib.fsstorage.FsStorage</a></li>
+<li><a href="#impl-fatartifactscontribazureblobstorageazureblobstorage">IMPL fatartifacts.contrib.azureblobstorage.AzureBlobStorage</a></li>
+</ul>
+</li>
+<li><a href="#accesscontrol">AccessControl</a><ul>
+<li><a href="#base-fatartifactsbaseaccesscontrolaccesscontrol">BASE fatartifacts.base.accesscontrol.AccessControl</a></li>
+<li><a href="#impl-fatartifactscontribsimpleacsimpleaccesscontrol">IMPL fatartifacts.contrib.simpleac.SimpleAccessControl</a></li>
+</ul>
+</li>
+<li><a href="#rest-api-authentication">REST Api Authentication</a><ul>
+<li><a href="#base-fatartifactswebauthauthorizer">BASE fatartifacts.web.auth.Authorizer</a></li>
+<li><a href="#impl-fatartifactswebauthhardcodedauthorizer">IMPL fatartifacts.web.auth.HardcodedAuthorizer</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+        
+      </div>
+    </div>
+
+    <!-- footer -->
+    <div class="ui inverted vertical footer segment">
+      <div class="ui center aligned container">
+          
+            <p>Copyright &copy; 2017  Niklas Rosenstein</p>
+          
+          <p>
+             &mdash; 
+            Generated with <a href="https://github.com/NiklasRosenstein/yassg">Yassg</a>
+          </p>
+      </div>
+    </div>
+  </body>
+</html>
