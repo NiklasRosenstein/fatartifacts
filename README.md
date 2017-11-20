@@ -14,6 +14,7 @@ __Database__
 __Storage__
 
 * `FsStorage` (store artifacts on the local filesystem)
+* `AzureBlobStorage` (Store files on Azure Blob Storage, requires `azure-storage` package)
 
 __AccessControl__
 
@@ -34,7 +35,6 @@ __CLI__
 __Todo__
 
 * `StorageLimits` (Control rate and size limits of the storage in the Flask REST API)
-* `AzureBlobStorage` (Store files on Azure Blob Storage)
 
 ### REST API
 
