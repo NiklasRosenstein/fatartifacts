@@ -34,6 +34,8 @@ class ListArtifactIds(Resource):
 
   def get(self, group_id):
     ac = app.accesscontrol
+    if not ac.get_group_permissions(request.user_id, group_id).can_read:
+      abort(404)
     return [
       artifact_id for artifact_id in app.database.get_artifact_ids(group_id)
       if ac.get_artifact_permissions(request.user_id, group_id, artifact_id).can_read
