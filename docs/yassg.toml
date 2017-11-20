@@ -1,2 +1,4 @@
 site-name = "FatArtifacts"
 footer-notice = "Copyright &copy; 2017  Niklas Rosenstein"
+github-repository = "NiklasRosenstein/fatartifacts"
+header-background-color = "#1677de"
