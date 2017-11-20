@@ -25,7 +25,8 @@ parser.add_argument('object', help='''
 )
 parser.add_argument('file', type=argparse.FileType('rb'), help='''
   The file that is to be uploaded to the repository.
-  '''
+  ''',
+  nargs='?'
 )
 parser.add_argument('-n', '--name', help='''
   The filename to save with the object. If not specified, the name of the
@@ -47,6 +48,11 @@ parser.add_argument('-u', '--auth', help='''
   part can be omitted, in which case the password will be requested via stdin.
   '''
 )
+parser.add_argument('-d', '--delete', action='store_true', help='''
+  Delete the object from the repository. Do not specify a FILE argument
+  when using this option.
+  '''
+)
 parser.add_argument('--test', action='store_true', help='''
   Print the information that would be sent to the repository and exit.
   '''
@@ -63,9 +69,15 @@ def main(argv=None):
   if len(parts) != 4:
     print('error: invalid object ID:', args.object)
     return 1
-  if not args.name:
+  if args.delete and args.file:
+    print('error: FILE and -d, --delete are incompatible options.')
+    return 1
+  if not args.delete and not args.file:
+    print('error: missing argument, specify either FILE or -d, --delete.')
+    return 1
+  if args.file and not args.name:
     args.name = os.path.basename(args.file.name)
-  if not args.mime:
+  if args.file and not args.mime:
     args.mime = mimetypes.guess_type(args.name)[0] or mimetypes.guess_type(args.file.name)[0]
     if not args.mime:
       print('error: MIME type could not be guess. Specify -m, --mime')
@@ -78,7 +90,9 @@ def main(argv=None):
       if not password:
         return 1
 
-  headers = {'Content-Type': args.mime, 'Content-Name': args.name}
+  headers = {}
+  if args.file:
+    headers.update({'Content-Type': args.mime, 'Content-Name': args.name})
   if args.auth:
     headers['Authorization'] = build_basicauth(username, password)
   url = args.apiurl.rstrip('/') + '/{}/{}/{}/{}'.format(*parts)
@@ -86,14 +100,18 @@ def main(argv=None):
     url = 'https://' + url
 
   if args.test:
-    command = ['curl', '-X', 'PUT', url]
+    command = ['curl', '-X', 'DELETE' if args.delete else 'PUT', url]
     for key, value in headers.items():
       command += ['-H', '{}: {}'.format(key, value)]
-    command += ['-d', '@' + args.file.name]
+    if args.file:
+      command += ['-d', '@' + args.file.name]
     print('$', ' '.join(map(shlex.quote, command)))
     return 0
 
-  response = requests.put(url, data=args.file, headers=headers)
+  if args.delete:
+    response = requests.delete(url, headers=headers)
+  else:
+    response = requests.put(url, data=args.file, headers=headers)
   print(response.json()['message'])
   if response.status_code != 200:
     return 2
