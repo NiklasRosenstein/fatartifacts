@@ -4,39 +4,39 @@ title = "Layers"
 
 ## Database
 
-### BASE `fatartifacts.base.database.PonyDatabase`
+### `fatartifacts.base.database.Database`
 
-### IMPL `fatartifacts.contrib.ponydb.PonyDatabase`
+### `fatartifacts.contrib.ponydb.PonyDatabase`
 
 A database implementation using Pony-ORM. Can be connected to anything that
 Pony supports, for example SQLite, PostgreSQL and MySQL.
 
 ## Storage
 
-### BASE `fatartifacts.base.storage.Storage`
+### `fatartifacts.base.storage.Storage`
 
-### BASE `fatartifacts.contrib.fsstorage.FsStorage`
+### `fatartifacts.contrib.fsstorage.FsStorage`
 
 Manages objects on the local-filesystem under one common directory.
 
-### IMPL `fatartifacts.contrib.azureblobstorage.AzureBlobStorage`
+### `fatartifacts.contrib.azureblobstorage.AzureBlobStorage`
 
 Manages objects on an Azure Blob Storage account.
 
 ## AccessControl
 
-### BASE `fatartifacts.base.accesscontrol.AccessControl`
+### `fatartifacts.base.accesscontrol.AccessControl`
 
-### IMPL `fatartifacts.contrib.simpleac.SimpleAccessControl`
+### `fatartifacts.contrib.simpleac.SimpleAccessControl`
 
 Global read, user-bound write/delete, optionally group IDs must be prefixed
 with the user ID.
 
 ## REST Api Authentication
 
-### BASE `fatartifacts.web.auth.Authorizer`
+### `fatartifacts.web.auth.Authorizer`
 
-### IMPL `fatartifacts.web.auth.HardcodedAuthorizer`
+### `fatartifacts.web.auth.HardcodedAuthorizer`
 
 Hardcode usernames and password-hashes with a Python dictionary. Example:
 
