@@ -5,11 +5,11 @@ Local file-system storage implementation.
 from ..base import storage
 from typing import *
 from typing import BinaryIO
-from werkzeug.utils import secure_filename
 import os
 import hashlib
 import shutil
 import tempfile
+import werkzeug.utils
 
 
 class FsWriteStream(storage.WriteStream):
@@ -66,22 +66,29 @@ class FsWriteStream(storage.WriteStream):
     return written
 
 
-class FsStorage(storage.Storage):
+class BaseFsStorage(storage.Storage):
 
-  def __init__(self, directory: str, hash_length=6):
+  def __init__(self, prefix_length: int=6):
+    self.prefix_length = prefix_length
+
+  def secure_filename(self, name: str) -> str:
+    prefix = hashlib.sha1(name.encode('utf8')).hexdigest()[:self.prefix_length]
+    return prefix + '-' + werkzeug.utils.secure_filename(name)
+
+
+class FsStorage(BaseFsStorage):
+
+  def __init__(self, directory: str, prefix_length: int=6):
+    super().__init__(prefix_length)
     self.directory = directory
-    self.hash_length = hash_length
-
-  def _hash(self, text: str):
-    return hashlib.sha1(text.encode('utf8')).hexdigest()[:self.hash_length]
 
   def get_storage_path(self, group_id: str, artifact_id: str, version: str,
                        tag: str, filename: str) -> str:
     return os.path.join(self.directory,
-      self._hash(group_id)    + '-' + secure_filename(group_id),
-      self._hash(artifact_id) + '-' + secure_filename(artifact_id),
-      self._hash(version)     + '-' + secure_filename(version),
-      self._hash(tag)         + '-' + secure_filename(tag + '-' + filename)
+      self.secure_filename(group_id),
+      self.secure_filename(artifact_id),
+      self.secure_filename(version),
+      self.secure_filename(tag + '-' + filename)
     )
 
   def open_write_file(self, group_id: str, artifact_id: str, version: str,
