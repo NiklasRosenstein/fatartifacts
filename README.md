@@ -70,7 +70,7 @@ Example requests:
     }
     $ curl -X PUT http://com.coolinc:PleaseDontStealMySecrets@localhost:5000/com.coolinc/coolsoftware/1.3.0/linux-x86_64 \
       -H 'Content-Type: application/octet' \
-      -H 'Content-Name: coolsoftware-1.3.0-inux-x86_64.deb' \
+      -H 'Content-Name: coolsoftware-1.3.0-linux-x86_64.deb' \
       -d @build/dist.deb
     {
       "message": "Object com.coolinc:coolsoftware:1.3.0:linux-x86_64 created."
