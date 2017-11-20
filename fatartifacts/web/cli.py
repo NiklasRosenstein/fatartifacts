@@ -61,6 +61,11 @@ parser.add_argument('--test', action='store_true', help='''
   Print the information that would be sent to the repository and exit.
   '''
 )
+parser.add_argument('--forward-auth', action='store_true', help='''
+  Pass the same HTTP BasicAuth information when downloading the file. This
+  may be necessary for private artifact repositories.
+  '''
+)
 
 def build_basicauth(username, password):
   data = ('%s:%s' % (username, password)).encode('ISO-8859-1')
@@ -144,10 +149,11 @@ def main(argv=None):
   if args.output:
     data = response.json()
     download_url = urllib.parse.urljoin(args.apiurl, data['url'])
-    response = requests.get(download_url, headers=auth_only_headers, stream=True)
+    headers = auth_only_headers if args.forward_auth else {}
+    response = requests.get(download_url, headers=headers, stream=True)
     try:
       response.raise_for_status()
-    except requests.exceptions.HTTException as exc:
+    except requests.exceptions.HTTPError as exc:
       print('error:', exc)
       return 3
 

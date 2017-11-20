@@ -135,7 +135,7 @@ the group or artifact.
 
 ```
 usage: fatartifacts-rest-cli [-h] [-n NAME] [-m MIME] [-u AUTH] [-d]
-                             [-o OUTPUT] [--test]
+                             [-o OUTPUT] [--test] [--forward-auth]
                              apiurl object [file]
 
 The FatArtifacts CLI for the REST API to upload artifacts.
@@ -168,4 +168,7 @@ optional arguments:
                         download to stdout.
   --test                Print the information that would be sent to the
                         repository and exit.
+  --forward-auth        Pass the same HTTP BasicAuth information when
+                        downloading the file. This may be necessary for
+                        private artifact repositories.
 ```
