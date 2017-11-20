@@ -110,7 +110,7 @@ class PonyDatabase(database.Database):
                           version: str, tag: str) -> database.ArtifactObject:
     group = self.db.Group.get(id=group_id)
     if not group:
-      return []
+      raise database.ArtifactDoesNotExist(group_id, artifact_id, version, tag)
     artifact = self.db.Artifact.get(group=group, id=artifact_id)
     if not artifact:
       raise database.ArtifactDoesNotExist(group_id, artifact_id, version, tag)
