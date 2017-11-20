@@ -47,10 +47,35 @@ Get it running:
 
     $ FLASK_APP=fatartifacts/web/server.py flask run
 
-Example request:
+Example requests:
 
     $ curl localhost:5000/
-    []
+    ["com.coolinc"]
+    $ curl localhost:5000/com.coolinc
+    ["coolsoftware"]
+    $ curl localhost:5000/com.coolinc/coolsoftware
+    ["1.0.0", "1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.3.0"]
+    $ curl localhost:5000/com.coolinc/coolsoftware/1.3.0
+    {
+      "win32-x86_64": {
+        "filename": "coolsoftware-1.3.0-win32-x86_64.exe",
+        "mime": "application/octet",
+        "url": "/read/com.coolinc/coolsoftware/1.3.0/win32-x86_64"
+      },
+      "darwin-x86_64": {
+        "filename": "coolsoftware-1.3.0-darwin-x86_64.dmg",
+        "mime": "application/octet",
+        "url": "/read/com.coolinc/coolsoftware/1.3.0/darwin-x86_64"
+      }
+    }
+    $ curl -X PUT http://com.coolinc:PleaseDontStealMySecrets@localhost:5000/com.coolinc/coolsoftware/1.3.0/linux-x86_64 \
+      -H 'Content-Type: application/octet' \
+      -H 'Content-Name: coolsoftware-1.3.0-inux-x86_64.deb' \
+      -d @build/dist.deb
+    {
+      "message": "Object com.coolinc:coolsoftware:1.3.0:linux-x86_64 created."
+    }
+
 
 #### GET `/`
 
@@ -66,7 +91,7 @@ List all available artifact versions of the artifact *artifact_id* in the
 group *group_id*. Returns 404 if you do not have read-access to the group
 or artifact.
 
-##### GET `/<group_id>/<artifact_id>/<version>`
+#### GET `/<group_id>/<artifact_id>/<version>`
 
 Returns an object that maps tag-names to an ObjectWithoutTag. Returns 404
 if you do not have read-access to the group or artifact.
@@ -76,18 +101,6 @@ _ObjectWithoutTag_
 * `filename`: The filename of the object.
 * `mime`: The mimetype of the object.
 * `url`: The download URL of the object.
-
-Example response for `/com.coolinc/coolsoftware/1.3.0`:
-
-```
-{
-  "win32-x86_64-release": {
-    "filename": "coolsoftware-1.3.0-win32-x86_64.exe",
-    "mime": "application/octet",
-    "url": "/read/com.coolinc/coolsoftware/1.3.0/win32-x86_64-release"
-  }
-}
-```
 
 #### GET `/<group_id>/<artifact_id>/<version>/<tag>`
 
