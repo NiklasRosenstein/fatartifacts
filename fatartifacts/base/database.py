@@ -45,6 +45,11 @@ class Database(metaclass=abc.ABCMeta):
                       object: ArtifactObject):
     pass
 
+  @abc.abstractmethod
+  def delete_artifact(self, group_id: str, artifact_id: str, version: str,
+                      tag: str) -> ArtifactObject:
+    pass
+
 
 class _ArtifactException(Exception):
 

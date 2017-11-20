@@ -33,6 +33,8 @@ class WriteStream(metaclass=abc.ABCMeta):
     pass
 
 
+# XXX Exception types for errors in the Storage API?
+
 class Storage(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
@@ -59,8 +61,7 @@ class Storage(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   def delete_file(self, group_id: str, artifact_id: str, version: str,
-                  tag: str, filename: str) -> bool:
+                  tag: str, filename: str, uri: str):
     """
-    Delete a file in the storage. Returns #True if the file could be deleted,
-    #False otherwise (eg. if the file does not exist).
+    Delete a file in the storage.
     """

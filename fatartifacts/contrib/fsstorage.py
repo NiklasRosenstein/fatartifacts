@@ -81,10 +81,8 @@ class FsStorage(storage.Storage):
     return open(uri[7:], 'rb')
 
   def delete_file(self, group_id: str, artifact_id: str, version: str,
-                  tag: str, filename: str) -> bool:
-    path = self.get_storage_path(group_id, artifact_id, version, tag, filename)
-    try:
-      os.remove(path)
-    except FileNotFoundError:
-      return False
-    return True
+                  tag: str, filename: str, uri: str):
+    if not uri.startswith('file://'):
+      raise FileNotFoundError(filename)
+    #path = self.get_storage_path(group_id, artifact_id, version, tag, filename)
+    os.remove(uri[7:])

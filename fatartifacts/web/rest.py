@@ -106,6 +106,18 @@ class Object(Resource):
 
     return {'message': "Artifact created."}
 
+  def delete(self, group_id, artifact_id, version, tag):
+    if not app.accesscontrol.get_artifact_permissions(request.user_id, group_id, artifact_id).can_delete:
+      abort(403)
+
+    try:
+      obj = app.database.delete_artifact(group_id, artifact_id, version, tag)
+    except ArtifactDoesNotExist:
+      abort(404)
+
+    app.storage.delete_file(group_id, artifact_id, version, tag, obj.filename, obj.uri)
+    return {'message': 'Artifact deleted.'}
+
 
 api.add_resource(ListGroupIds, '/')
 api.add_resource(ListArtifactIds, '/<group_id>')

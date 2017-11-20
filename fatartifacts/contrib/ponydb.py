@@ -102,7 +102,7 @@ class PonyDatabase(database.Database):
       return []
     return iter(
       database.ArtifactObject(tag=o.tag, filename=o.filename, uri=o.uri, mime=o.mime)
-      for o in orm.select(o for o in self.db.Object if o in version.objects)
+      for o in version.objects
     )
 
   @orm.db_session
@@ -133,3 +133,16 @@ class PonyDatabase(database.Database):
       raise database.ArtifactAlreadyExists(group_id, artifact_id, version.string, object.tag)
     self.db.Object(version=version, tag=object.tag, filename=object.filename,
       uri=object.uri, mime=object.mime)
+
+  @orm.db_session
+  def delete_artifact(self, group_id: str, artifact_id: str, version: str,
+                      tag: str) -> database.ArtifactObject:
+    group = self.db.Group.get_or_create(group_id)
+    artifact = self.db.Artifact.get_or_create(group, artifact_id)
+    version = self.db.Version.get_or_create(artifact, version)
+    obj = self.db.Object.get(version=version, tag=tag)
+    if not obj:
+      raise database.ArtifactDoesNotExist(group_id, artifact_id, version.string, tag)
+    result = database.ArtifactObject(obj.tag, obj.filename, obj.uri, obj.mime)
+    obj.delete()
+    return result
