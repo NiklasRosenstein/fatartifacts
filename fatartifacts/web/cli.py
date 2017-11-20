@@ -80,7 +80,7 @@ def main(argv=None):
   if args.file and not args.mime:
     args.mime = mimetypes.guess_type(args.name)[0] or mimetypes.guess_type(args.file.name)[0]
     if not args.mime:
-      print('error: MIME type could not be guess. Specify -m, --mime')
+      print('error: unable to guess MIME type. Specify -m, --mime')
       return 1
   username = password = None
   if args.auth:
