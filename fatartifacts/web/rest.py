@@ -32,7 +32,7 @@ class ListVersions(Resource):
 class ListObjects(Resource):
 
   def get(self, group_id, artifact_id, version):
-    result = []
+    result = {}
     for o in app.database.get_artifact_objects(group_id, artifact_id, version):
       if o.has_web_uri():
         url = o.uri
@@ -40,7 +40,7 @@ class ListObjects(Resource):
         url = url_for(__name__ + '.read',
           group_id=group_id, artifact_id=artifact_id, version=version,
           tag=o.tag)
-      result.append({'tag': o.tag, 'filename': o.filename, 'url': url})
+      result[o.tag] = {'filename': o.filename, 'url': url}
     return result
 
 
