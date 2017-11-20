@@ -35,8 +35,20 @@ The REST API can be embedded into existing Flask applications using the
 `fatartifacts.web.rest.app` blueprint. Alternatively, you can serve the
 REST API using the `fatartifacts.web.server.app` Flask application.
 
-The `HardcodedAuthorizer` (from the `fatartifacts.web.auth` module) uses
-HTTP BasicAuth.
+> **Important**: Make sure you update the `fatartifacts_server_config.py`
+> before you use the built-in server.
+>
+> The `HardcodedAuthorizer` (from the `fatartifacts.web.auth` module)
+> uses HTTP BasicAuth and the information passed to it's constructor.
+
+Get it running:
+
+    $ FLASK_APP=fatartifacts/web/server.py flask run
+
+Example request:
+
+    $ curl localhost:5000/
+    []
 
 #### GET `/`
 
