@@ -101,12 +101,12 @@ class Object(Resource):
         obj = ArtifactObject(tag, filename, uri, mime)
         app.database.create_artifact(group_id, artifact_id, version, obj)
       except ArtifactAlreadyExists as exc:
-        abort(400, 'Artifact {} already exists.'.format(exc))
+        abort(400, 'Object {} already exists.'.format(exc))
 
       # Copy the rest of the data.
       shutil.copyfileobj(request.stream, dst)
 
-    return {'message': "Artifact created."}
+    return {'message': "Object {}:{}:{}:{} created.".format(group_id, artifact_id, version, tag)}
 
   def delete(self, group_id, artifact_id, version, tag):
     if not app.accesscontrol.get_artifact_permissions(request.user_id, group_id, artifact_id).can_delete:
@@ -118,7 +118,7 @@ class Object(Resource):
       abort(404)
 
     app.storage.delete_file(group_id, artifact_id, version, tag, obj.filename, obj.uri)
-    return {'message': 'Artifact deleted.'}
+    return {'message': "Object {}:{}:{}:{} deleted.".format(group_id, artifact_id, version, tag)}
 
 
 api.add_resource(ListGroupIds, '/')
