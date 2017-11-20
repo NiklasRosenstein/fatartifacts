@@ -1,3 +1,5 @@
+<img src=".assets/fa-logo.png" height="128px">
+
 ## FatArtifacts
 
 FatArtifacts is a modular abstraction  of a general-purpose artifact
