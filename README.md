@@ -2,24 +2,28 @@
 
 ## FatArtifacts
 
-FatArtifacts is a general-purpose artifact repository application with a
-REST-Api. It's granular design makes it very scalable and a great choice to
-fit your custom requirements. If you just want a simple artifact repository
-though, rolling with the standard layers will get you rolling quickly!
+FatArtifacts is a general-purpose, highly customizable and extensible artifact
+repository.
 
-With FatArtifact's abstraction layers, you have fine-grained control over
-the following aspects (standard implementations available in FatArtifacts
-in parentheses):
+__Features__
 
-* Database-store method (eg. `PonyDatabase` which supports many SQL database)
-* Artifact-object store method (eg. `FsStorage` or `AzureBlobStorage`)
-* User authentication and permissions (eg. `HardcodedAuthorizer`)
-* Rate and object-size limiting (**TODO**)
+* High level of abstraction
+* Fine-grain permission control
+* Configurable namespace-depth
+* Allows you to associate arbitrary JSON metadata with every namespace
+* Built-in support for Azure Blob Storage and standard SQL databases
+* REST-Api included
 
-It is very likely that you'll be able to roll with the default layers, except
-maybe for the permission-layer, which you might want to connect to your own
-authorization method (eg. authorization with existing user credentials from
-another application).
+__Deployment__
+
+1. **Clone the repository** and install the requirements with Pip or Pipenv
+2. **Update the configuration file** named `fatartifacts_server_config.py`
+3. **Start the server** with `FLASK_APP=fatartifacts/web/server.py flask run`
+
+You may want to choose a different production server than the standard Flask
+WSGI server (eg. eventlet or gunicorn).
+
+---
 
 Check out the [Documentation] for more information.
 

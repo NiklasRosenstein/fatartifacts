@@ -2,35 +2,44 @@
 title = "Layers"
 +++
 
+This section describes the available layers and their implementations
+delivered with FatArtifacts.
+
 ## Database
 
-### `fatartifacts.base.database.Database`
+### `fatartifacts.database.base.Database`
 
-### `fatartifacts.contrib.ponydb.PonyDatabase`
+### `fatartifacts.database.ponyorm.PonyDatabase`
 
 A database implementation using Pony-ORM. Can be connected to anything that
 Pony supports, for example SQLite, PostgreSQL and MySQL.
 
 ## Storage
 
-### `fatartifacts.base.storage.Storage`
+### `fatartifacts.storage.base.Storage`
 
-### `fatartifacts.contrib.fsstorage.FsStorage`
+### `fatartifacts.storage.fs.FsStorage`
 
 Manages objects on the local-filesystem under one common directory.
 
-### `fatartifacts.contrib.azureblobstorage.AzureBlobStorage`
+### `fatartifacts.storage.azureblob.AzureBlobStorage`
 
 Manages objects on an Azure Blob Storage account.
 
+```python
+from fatartifacts.storage.azureblob import AzureBlobStorage
+storage = AzureBlobStorage.with_blob_block_service(
+  container = 'MyContainerName',
+  account_name='MyFatArtifacts',
+  account_key='AZUREACCOUNTAPIKEYHERE...'
+)
+```
+
 ## AccessControl
 
-### `fatartifacts.base.accesscontrol.AccessControl`
+### `fatartifacts.accesscontrol.base.AccessControl`
 
-### `fatartifacts.contrib.simpleac.SimpleAccessControl`
-
-Global read, user-bound write/delete, optionally group IDs must be prefixed
-with the user ID.
+### `fatartifacts.accesscontrol.userspace.UserSpaceAccessControl`
 
 ## REST Api Authentication
 
