@@ -107,23 +107,26 @@
           
           <p><img src=".assets/fa-logo.png" height="128px"></p>
 <h2 id="fatartifacts">FatArtifacts</h2>
-<p>FatArtifacts is a general-purpose artifact repository application with a
-REST-Api. It's granular design makes it very scalable and a great choice to
-fit your custom requirements. If you just want a simple artifact repository
-though, rolling with the standard layers will get you rolling quickly!</p>
-<p>With FatArtifact's abstraction layers, you have fine-grained control over
-the following aspects (standard implementations available in FatArtifacts
-in parentheses):</p>
+<p>FatArtifacts is a general-purpose, highly customizable and extensible artifact
+repository.</p>
+<p><strong>Features</strong></p>
 <ul>
-<li>Database-store method (eg. <code>PonyDatabase</code> which supports many SQL database)</li>
-<li>Artifact-object store method (eg. <code>FsStorage</code> or <code>AzureBlobStorage</code>)</li>
-<li>User authentication and permissions (eg. <code>HardcodedAuthorizer</code>)</li>
-<li>Rate and object-size limiting (<strong>TODO</strong>)</li>
+<li>High level of abstraction</li>
+<li>Fine-grain permission control</li>
+<li>Configurable namespace-depth</li>
+<li>Allows you to associate arbitrary JSON metadata with every namespace</li>
+<li>Built-in support for Azure Blob Storage and standard SQL databases</li>
+<li>REST-Api included</li>
 </ul>
-<p>It is very likely that you'll be able to roll with the default layers, except
-maybe for the permission-layer, which you might want to connect to your own
-authorization method (eg. authorization with existing user credentials from
-another application).</p>
+<p><strong>Deployment</strong></p>
+<ol>
+<li><strong>Clone the repository</strong> and install the requirements with Pip or Pipenv</li>
+<li><strong>Update the configuration file</strong> named <code>fatartifacts_server_config.py</code></li>
+<li><strong>Start the server</strong> with <code>FLASK_APP=fatartifacts/web/server.py flask run</code></li>
+</ol>
+<p>You may want to choose a different production server than the standard Flask
+WSGI server (eg. eventlet or gunicorn).</p>
+<hr />
 <p>Check out the <a href="https://niklasrosenstein.github.io/fatartifacts">Documentation</a> for more information.</p>
         </div>
 

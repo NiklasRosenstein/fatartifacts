@@ -107,22 +107,31 @@
           
             <h1>Layers</h1>
           
-          <h2 id="database">Database</h2>
-<h3 id="fatartifactsbasedatabasedatabase"><code>fatartifacts.base.database.Database</code></h3>
-<h3 id="fatartifactscontribponydbponydatabase"><code>fatartifacts.contrib.ponydb.PonyDatabase</code></h3>
+          <p>This section describes the available layers and their implementations
+delivered with FatArtifacts.</p>
+<h2 id="database">Database</h2>
+<h3 id="fatartifactsdatabasebasedatabase"><code>fatartifacts.database.base.Database</code></h3>
+<h3 id="fatartifactsdatabaseponyormponydatabase"><code>fatartifacts.database.ponyorm.PonyDatabase</code></h3>
 <p>A database implementation using Pony-ORM. Can be connected to anything that
 Pony supports, for example SQLite, PostgreSQL and MySQL.</p>
 <h2 id="storage">Storage</h2>
-<h3 id="fatartifactsbasestoragestorage"><code>fatartifacts.base.storage.Storage</code></h3>
-<h3 id="fatartifactscontribfsstoragefsstorage"><code>fatartifacts.contrib.fsstorage.FsStorage</code></h3>
+<h3 id="fatartifactsstoragebasestorage"><code>fatartifacts.storage.base.Storage</code></h3>
+<h3 id="fatartifactsstoragefsfsstorage"><code>fatartifacts.storage.fs.FsStorage</code></h3>
 <p>Manages objects on the local-filesystem under one common directory.</p>
-<h3 id="fatartifactscontribazureblobstorageazureblobstorage"><code>fatartifacts.contrib.azureblobstorage.AzureBlobStorage</code></h3>
+<h3 id="fatartifactsstorageazureblobazureblobstorage"><code>fatartifacts.storage.azureblob.AzureBlobStorage</code></h3>
 <p>Manages objects on an Azure Blob Storage account.</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">fatartifacts.storage.azureblob</span> <span class="kn">import</span> <span class="n">AzureBlobStorage</span>
+<span class="n">storage</span> <span class="o">=</span> <span class="n">AzureBlobStorage</span><span class="o">.</span><span class="n">with_blob_block_service</span><span class="p">(</span>
+  <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;MyContainerName&#39;</span><span class="p">,</span>
+  <span class="n">account_name</span><span class="o">=</span><span class="s1">&#39;MyFatArtifacts&#39;</span><span class="p">,</span>
+  <span class="n">account_key</span><span class="o">=</span><span class="s1">&#39;AZUREACCOUNTAPIKEYHERE...&#39;</span>
+<span class="p">)</span>
+</pre></div>
+
+
 <h2 id="accesscontrol">AccessControl</h2>
-<h3 id="fatartifactsbaseaccesscontrolaccesscontrol"><code>fatartifacts.base.accesscontrol.AccessControl</code></h3>
-<h3 id="fatartifactscontribsimpleacsimpleaccesscontrol"><code>fatartifacts.contrib.simpleac.SimpleAccessControl</code></h3>
-<p>Global read, user-bound write/delete, optionally group IDs must be prefixed
-with the user ID.</p>
+<h3 id="fatartifactsaccesscontrolbaseaccesscontrol"><code>fatartifacts.accesscontrol.base.AccessControl</code></h3>
+<h3 id="fatartifactsaccesscontroluserspaceuserspaceaccesscontrol"><code>fatartifacts.accesscontrol.userspace.UserSpaceAccessControl</code></h3>
 <h2 id="rest-api-authentication">REST Api Authentication</h2>
 <h3 id="fatartifactswebauthauthorizer"><code>fatartifacts.web.auth.Authorizer</code></h3>
 <h3 id="fatartifactswebauthhardcodedauthorizer"><code>fatartifacts.web.auth.HardcodedAuthorizer</code></h3>
@@ -145,19 +154,19 @@ with the user ID.</p>
           <div class="toc">
 <ul>
 <li><a href="#database">Database</a><ul>
-<li><a href="#fatartifactsbasedatabasedatabase">fatartifacts.base.database.Database</a></li>
-<li><a href="#fatartifactscontribponydbponydatabase">fatartifacts.contrib.ponydb.PonyDatabase</a></li>
+<li><a href="#fatartifactsdatabasebasedatabase">fatartifacts.database.base.Database</a></li>
+<li><a href="#fatartifactsdatabaseponyormponydatabase">fatartifacts.database.ponyorm.PonyDatabase</a></li>
 </ul>
 </li>
 <li><a href="#storage">Storage</a><ul>
-<li><a href="#fatartifactsbasestoragestorage">fatartifacts.base.storage.Storage</a></li>
-<li><a href="#fatartifactscontribfsstoragefsstorage">fatartifacts.contrib.fsstorage.FsStorage</a></li>
-<li><a href="#fatartifactscontribazureblobstorageazureblobstorage">fatartifacts.contrib.azureblobstorage.AzureBlobStorage</a></li>
+<li><a href="#fatartifactsstoragebasestorage">fatartifacts.storage.base.Storage</a></li>
+<li><a href="#fatartifactsstoragefsfsstorage">fatartifacts.storage.fs.FsStorage</a></li>
+<li><a href="#fatartifactsstorageazureblobazureblobstorage">fatartifacts.storage.azureblob.AzureBlobStorage</a></li>
 </ul>
 </li>
 <li><a href="#accesscontrol">AccessControl</a><ul>
-<li><a href="#fatartifactsbaseaccesscontrolaccesscontrol">fatartifacts.base.accesscontrol.AccessControl</a></li>
-<li><a href="#fatartifactscontribsimpleacsimpleaccesscontrol">fatartifacts.contrib.simpleac.SimpleAccessControl</a></li>
+<li><a href="#fatartifactsaccesscontrolbaseaccesscontrol">fatartifacts.accesscontrol.base.AccessControl</a></li>
+<li><a href="#fatartifactsaccesscontroluserspaceuserspaceaccesscontrol">fatartifacts.accesscontrol.userspace.UserSpaceAccessControl</a></li>
 </ul>
 </li>
 <li><a href="#rest-api-authentication">REST Api Authentication</a><ul>
