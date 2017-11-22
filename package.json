@@ -1,0 +1,16 @@
+{
+  "name": "fatartifacts",
+  "publish": false,
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2016": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "jquery": "^3.2.1",
+    "react": "^16.1.1",
+    "react-dom": "^16.1.1",
+    "react-keyed-file-browser": "^1.0.1",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.4"
+  }
+}

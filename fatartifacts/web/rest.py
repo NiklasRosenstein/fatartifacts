@@ -1,5 +1,6 @@
 
 from .auth import AuthorizationError
+from .decorators import check_auth
 from fatartifacts.database import base as database
 from fatartifacts.storage import base as storage
 from flask import abort, current_app, redirect, request, url_for, send_file, Blueprint, Response
@@ -82,22 +83,6 @@ def close_input_stream(func):
       fp = request.environ.get('wsgi.input')
       if fp:
         fp.close()
-  return wrapper
-
-
-def check_auth(func):
-  """
-  Decorator that uses the Web authentication layer creates to create the
-  `request.user_id` member.
-  """
-
-  @functools.wraps(func)
-  def wrapper(*a, **kw):
-    try:
-      request.user_id = config.auth.do_authorization(request)
-    except AuthorizationError as exc:
-      abort(403, str(exc))
-    return func(*a, **kw)
   return wrapper
 
 
@@ -264,7 +249,7 @@ def _handle_put_object(loc):
 
 @app.route('/info', methods=['GET'])
 @jsonify()
-@check_auth
+@check_auth(config)
 def info():
   perm = config.accesscontrol.get_permissions(database.Location(''), request.user_id)
   if not perm.can_read:
@@ -277,7 +262,7 @@ def info():
 @app.route('/location', methods=['GET'], strict_slashes=False)
 @app.route('/location/<path:path>', methods=['GET', 'PUT', 'DELETE'])
 @jsonify(cls=JsonEncoder)
-@check_auth
+@check_auth(config)
 def location(path=''):
   ac = config.accesscontrol
   loc = database.Location(path)
@@ -370,7 +355,7 @@ def location(path=''):
 
 
 @app.route('/read/<path:path>')
-@check_auth
+@check_auth(config)
 def read(path):
   location = database.Location(path)
   if len(location) != config.database.num_levels():

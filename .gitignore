@@ -1,4 +1,5 @@
 /_storage/
+/node_modules/
 /Pipfile
 /Pipfile.lock
 *.egg-info
